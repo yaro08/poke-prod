@@ -33,7 +33,7 @@ app.use('/', express.static('client', {redirect:false}));
 app.use('/api',pokemon_routes);
 
 app.get('*',function(req, res, next){
-    res.sendfile(path.resolve('client/index.html'));
+    res.sendFile(path.resolve('client/index.html'));
 });
 
 module.exports = app;

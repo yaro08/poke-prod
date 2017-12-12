@@ -3,20 +3,14 @@
 var Pokemon = require('../models/m_pokemon');
 
 
-
-function pruebas(req,res){
-    res.status(200).send({
-       message: 'Test route' 
-    });
-};
-
 function addPokemon(req,res) {
     var pokemon = new Pokemon();
 
     var params = req.body;
-    console.log("params");
-    console.log(req);
+
     if (params && params.name) {
+        //FALTA COMPROBAR PREVIAMENTE QUE TODOS LOS DATOS NO SON NULOS
+        //Y CUMPLEN LAS RESTRICCIONES
         pokemon.name = params.name;
         pokemon.type = params.type;
         pokemon.description = params.description;
@@ -26,16 +20,17 @@ function addPokemon(req,res) {
         pokemon.save((err,result) =>{
             if (err) {
                 res.status(500).send({
-                    message: 'Error: trying to save the pokemon'
+                    message: 'Error al guardar el pokemon.'
                 });
             } else if (result) {
                 res.status(200).send({
-                    message: 'The pokemon has been saved',
+                    status: "OK",
+                    message: 'El pokemon se ha guardado con éxito.',
                     result: result 
                 });
             } else{
                 res.status(200).send({
-                    message: 'Error: The pokemon could not be saved'
+                    message: 'Error: no se ha podido guardar el pokemon'
                 });
             }
         });
@@ -49,16 +44,17 @@ function getPokemons(req,res) {
     Pokemon.find({}).sort({'_id':-1}).exec((err,result) =>{
         if (err) {
             res.status(500).send({
-                message: 'Error: trying to get your pokemons :('
+                message: 'Error al intentar encontrar tus pokemons'
             });
         } else if (result) {
             res.status(200).send({
+                status: 'OK',
                 message: 'OK',
                 result: result 
             });
         } else{
             res.status(404).send({
-                message: 'You do not have any pokemon'
+                message: 'Parece que no tienes ningún pokemon todavia.'
             });
         }  
     });
@@ -69,16 +65,17 @@ function getPokemon(req,res) {
     Pokemon.findById(pokemonId).exec((err, result) =>{
         if (err) {
             res.status(500).send({
-                message: 'Error: trying to get your pokemon :('
+                message: 'Error al intentar encontrar tus pokemon.'
             });
         } else if (result) {
             res.status(200).send({
+                status: 'OK',
                 message: 'OK',
                 result: result 
             });
         } else{
             res.status(404).send({
-                message: 'Do not exist this pokemon'
+                message: 'Parece que este pokemon no existe.'
             });
         }  
     });
@@ -88,23 +85,20 @@ function updatePokemon(req,res){
     var pokemonId = req.params.id;
     var update = req.body;
 
-    console.log("updatePokemon");
-    console.log(pokemonId);
-    console.log(update['_id']);
-
     Pokemon.findByIdAndUpdate(pokemonId, update, {new:false},(err,pokemonUpdated) =>{
         if (err) {
             res.status(500).send({
-                message: 'An error has ocurred in the server.'
+                message: 'Ha ocurrido un error en el servidor.'
             });
         } else if (pokemonUpdated) {
             res.status(200).send({
-                message: 'OK',
+                status: 'OK',
+                message: 'El pokemon se ha actualizado con éxito.',
                 result: pokemonUpdated 
             });
         } else{
             res.status(404).send({
-                message: 'Do not exist this pokemon'
+                message: 'Parece que este pokemon no existe.'
             });
         }  
     });
@@ -127,17 +121,18 @@ function favPokemon(req,res){
             Pokemon.findByIdAndUpdate(pokemonId, fav, {new:true},(err,pokemonUpdated) =>{
                 if (err) {
                     res.status(500).send({
-                        message: 'An error has ocurred in the server.'
+                        message: 'Ha ocurrido un error en el servidor.'
                     });
                 } else if (pokemonUpdated) {
                     
                     res.status(200).send({
+                        status: 'OK',
                         message: 'OK',
                         result: pokemonUpdated 
                     });
                 } else{
                     res.status(404).send({
-                        message: 'Do not exist this pokemon'
+                        message: 'Parece que este pokemon no existe.'
                     });
                 }  
             });
@@ -149,38 +144,29 @@ function deletePokemon(req,res){
     Pokemon.findByIdAndRemove(pokemonId, (err,pokemonRemoved) =>{
         if (err) {
             res.status(500).send({
-                message: 'An error has ocurred in the server.'
+                message: 'Ha ocurrido un error en el servidor'
             });
         } else if (pokemonRemoved) {
             res.status(200).send({
+                status: 'OK',
                 message: 'OK',
                 result: pokemonRemoved 
             });
         } else{
             res.status(404).send({
-                message: 'Do not exist this pokemon'
+                message: 'Parece que este pokemon no existe.'
             });
         }  
     });
 }
 
-// function currentNFavs() {
-//     //MAX FAVS = 10
-//     Pokemon.count({fav: {$eq: 'true' }}, (err, count) =>{ 
-//         //console.log(count);
-//         return count;
-//     } );
-// }
-
 function currentNFavs(callback) {
     Pokemon.count({fav: {$eq: 'true' }}, (err, count) =>{ 
-        console.log("devuelve:"+count);
         callback(count);
     }); 
 }
 
 module.exports = {
-    pruebas,
     addPokemon,
     getPokemons,
     getPokemon,

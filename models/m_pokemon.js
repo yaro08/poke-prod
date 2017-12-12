@@ -4,7 +4,6 @@ var mongoose =require('mongoose');
 var Schema = mongoose.Schema;
 
 var PokemonSchema = Schema({
-    //_id: String,
     name: String,
     type: Array,
     description: String,
